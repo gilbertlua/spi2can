@@ -1,0 +1,3 @@
+# Start systemd service
+sudo systemctl start fmlx-spi2can
+sudo systemctl enable fmlx-spi2can

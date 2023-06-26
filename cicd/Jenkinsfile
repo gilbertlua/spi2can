@@ -1,0 +1,62 @@
+pipeline {
+	agent {
+		label 'rover-arm'
+	}
+	environment{
+		ARCH = 'armhf'
+		VERSION = sh(script: "grep 'Version' cicd/packages/fmlx-spi2can/DEBIAN/control | cut -d ':' -f2", , returnStdout: true).trim()
+	}
+	stages {
+		stage( 'build'){
+			steps{
+				sh "rm -rf build && rm -f *.deb"
+				sh '''
+					mkdir build
+					cd build
+					cmake ..
+					make
+				'''
+			}
+		}
+		stage( 'packaging' ){
+		    steps{
+		        echo "spi2can version : ${VERSION}"
+				dir('build'){
+					sh '''
+						cp -r ../cicd/packages .
+						cp fmlx-spi2can packages/fmlx-spi2can/opt/formulatrix/fmlx-spi2can
+						cd packages
+						chmod 755 fmlx-spi2can/DEBIAN/postinst fmlx-spi2can/DEBIAN/prerm
+						gzip fmlx-spi2can/usr/share/doc/fmlx-spi2can/changelog.Debian
+						dpkg-deb --build fmlx-spi2can fmlx-spi2can_${VERSION}_${ARCH}.deb
+						mv fmlx-spi2can_${VERSION}_${ARCH}.deb ../../
+					'''
+				}
+		    }
+		}
+        stage('deploy') {
+            steps {
+                sshPublisher(
+                continueOnError: false, failOnError: true,
+                publishers: [
+                    sshPublisherDesc(
+                    configName: "fmlx-jenkins",
+                    verbose: true,
+                    flatten: true,
+                    transfers: [
+                        sshTransfer(
+                            sourceFiles: "*.deb",
+                            remoteDirectory: "htdocs/debian/pool/stable",
+                            execCommand: "cd htdocs/debian && ./scanpackages.sh"
+                        )
+                    ])
+                ])
+            }
+        }
+	}
+    post{
+        always{
+            emailext body: '${JELLY_SCRIPT,template="text"}', subject: '[${BUILD_STATUS}] ${JOB_NAME} Build #${BUILD_NUMBER}', to: 'abdulbasid@m2.formulatrix.com'
+        }
+    }
+}

@@ -1,0 +1,8 @@
+Package: fmlx-spi2can
+Version: 1.0.1
+Architecture: armhf
+Installed-Size: 57K
+Maintainer: Formulatrix
+Description: SocketCanFmlxDriver's daemon and native library
+Date: Thu, 28 July 2021 16:34:00 -0400
+Depends: libconfig++-dev

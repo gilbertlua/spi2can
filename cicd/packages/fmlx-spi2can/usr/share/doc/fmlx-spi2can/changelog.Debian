@@ -1,0 +1,14 @@
+spi2can (1.0.1) stable; urgency=medium
+
+  * Add configuration value to disable CPU pin, by setting CPU id as -1
+
+  -- Magdalena S <magdalena.sihotang@m2.formulatrix.com>  Wed, 27 Jul 2021 12:00:00
+
+spi2can (1.0.0) stable; urgency=medium
+
+  * Add configuration file to set GPIO pin for spi, spi speed, spi linux device name, CAN interface name, and CPU id
+  * Add function to pin rx thread (that read from spi pin and write to vcan bus) to a static CPU id,
+    to fix the swapped can frame within 1 FmlxPacket issue found by Rover team
+  * Use original source code from Firmware team as baseline
+
+  -- Abdul B <abdul.basid@m2.formulatrix.com>  Mon, 29 Mar 2021 12:00:00

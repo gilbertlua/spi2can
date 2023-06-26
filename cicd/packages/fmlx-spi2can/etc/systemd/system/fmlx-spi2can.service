@@ -1,0 +1,18 @@
+[Unit]
+Description=Formulatrix spi2can daemon
+StartLimitBurst=3
+After=syslog.service
+Requires=syslog.service
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+ExecStartPre=/usr/bin/sudo chmod 775 /opt/formulatrix/tools/fmlx-spi2can/fmlx-spi2can-start.sh
+ExecStartPre=/usr/bin/sudo chmod 775 /opt/formulatrix/tools/fmlx-spi2can/fmlx-spi2can-stop.sh
+ExecStart=/bin/bash /opt/formulatrix/tools/fmlx-spi2can/fmlx-spi2can-start.sh 
+ExecStopPost=/bin/bash /opt/formulatrix/tools/fmlx-spi2can/fmlx-spi2can-stop.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target 
